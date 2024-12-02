@@ -8,16 +8,6 @@ public class BMTree implements BTree {
 		this.root = null;
 		this.degree = degree;
 	}
-	
-    // 전체 트리의 값을 배열로 출력
-    @Override
-    public ArrayList<Integer> print() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        if (root != null) {
-            root.print(result);
-        }
-        return result;
-    }
     
     // 특정 값을 찾는 메서드
     @Override
@@ -75,48 +65,27 @@ public class BMTree implements BTree {
 	        this.children = new Node[2 * degree];
 	    }	
 		
-		// 출력
-		public void print(ArrayList<Integer> arr) {
-			int keyCount = countKeys();
-			for (int i = 0; i < keyCount; i++) {
-	            if (!isLeaf) {
-	            	children[i].print(arr);
-	            }
-	            arr.add(keys[i]);
-	        }
-	        if (!isLeaf) {
-	        	children[keyCount].print(arr);
-	        }
-		}
-		
 	    // 키 검색 기능
 	    public Integer search(int key) {
 	        int i = 0;
-	        while (i < countKeys() && keys[i] < key) i++;
-	        
+	        while (i < countKeys() && keys[i] < key) i++;	        
 	        // 검색 결과 반환
-	        if (i < countKeys() && keys[i] == key) return keys[i]; 
-	        
+	        if (i < countKeys() && keys[i] == key) return keys[i]; 	        
 	        // 리프 노드에 도달했으므로 값이 없음
-	        if (isLeaf) return null; 
-	        
+	        if (isLeaf) return null; 	        
 	        // 자식 노드로 내려감
 	        return children[i].search(key); 
 	    }
 	    
 	    public void search(int start, int end, ArrayList<Integer> result) {
 	        int i = 0;
-	        while (i < countKeys() && keys[i] < start) i++;
-	        
-
+	        while (i < countKeys() && keys[i] < start) i++;  
 	        while (i < countKeys() && keys[i] <= end) {
 	            if (!isLeaf) children[i].search(start, end, result);            
 	            result.add(keys[i]);
 	            i++;
 	        }
-
-	        if (!isLeaf) children[i].search(start, end, result);
-	        
+	        if (!isLeaf) children[i].search(start, end, result);	        
 	    }
 		
 	   public void insert(int key) {
@@ -128,38 +97,28 @@ public class BMTree implements BTree {
 	                i--;
 	            }
 	            keys[i + 1] = key;  // 키 삽입
-	        } else {
-	            // 자식 노드로 내려가서 삽입
-	            while (i >= 0 && keys[i] > key) {
-	                i--;
-	            }
-	            i++;  // 자식 노드 인덱스
-	            
+	        } else { // 자식 노드로 내려가서 삽입
+	            while (i >= 0 && keys[i] > key) i--;	            
+	            i++;  // 자식 노드 인덱스	            
 	            // 자식 노드가 가득 차 있으면 분리
 	            if (children[i].countKeys() == 2 * degree - 1) {
 	                split(i, children[i]);  // 자식 노드 분리
-	                if (keys[i] < key) {
-	                    i++;  // 분리 후, 키에 맞는 자식으로 이동
-	                }
-	            }
-	            
+	                if (keys[i] < key) i++;  // 분리 후, 키에 맞는 자식으로 이동	                
+	            }	            
 	            // 적합한 자식 노드로 내려가서 삽입
 	            children[i].insert(key);
 	        }
 	    }
 	    
 	    public void split(int i, Node y) {
-	        int t = degree;  // 최소 차수
-	        
+	        int t = degree;  // 최소 차수	        
 	        // 새로운 노드 z 생성
-	        Node z = new Node(degree, y.isLeaf());
-	        
+	        Node z = new Node(degree, y.isLeaf());	        
 	        // y의 중간 키를 부모 노드로 이동
 	        for (int j = 0; j < t - 1; j++) {
 	            z.setKey(j, y.getKey(j + t));
 	            y.setKey(j + t, 0);  // 원래 노드에서 키 제거
-	        }
-	        
+	        }	        
 	        // 자식 노드가 있다면 분리된 자식 노드를 z로 이동
 	        if (!y.isLeaf()) {
 	            for (int j = 0; j < t; j++) {
@@ -167,39 +126,23 @@ public class BMTree implements BTree {
 	                y.setChild(j + t, null);  // 원래 노드에서 자식 제거
 	            }
 	        }
-
 	        // 부모 노드에 새로운 자식과 키 삽입
-	        for (int j = countKeys(); j >= i + 1; j--) {
-	            setChild(j + 1, getChild(j));
-	        }
-	        setChild(i + 1, z);  // z 자식 추가
-	        
-	        for (int j = countKeys() - 1; j >= i; j--) {
-	            setKey(j + 1, getKey(j));
-	        }
+	        for (int j = countKeys(); j >= i + 1; j--) setChild(j + 1, getChild(j));	        
+	        setChild(i + 1, z);  // z 자식 추가	        
+	        for (int j = countKeys() - 1; j >= i; j--) setKey(j + 1, getKey(j));	        
 	        setKey(i, y.getKey(t - 1));  // 부모에 중간 키 삽입
 	        y.setKey(t - 1, 0);  // y에서 중간 키 제거
 	    }
 	    
-		public boolean isLeaf() {
-			return this.isLeaf;
-		}
+		public boolean isLeaf() {return this.isLeaf;}
 		
-		public Node getChild(int i) {
-			return this.children[i];
-		}
+		public Node getChild(int i) {return this.children[i];}
 		
-		public void setChild(int i,Node node) {
-			this.children[i] = node;
-		}
+		public void setChild(int i,Node node) {this.children[i] = node;}
 		
-		public int getKey(int i) {
-			return this.keys[i];
-		}
+		public int getKey(int i) {return this.keys[i];}
 		
-		public void setKey(int i,int key) {
-			this.keys[i] = key;
-		}
+		public void setKey(int i,int key) {this.keys[i] = key;}
 		
 	    public int countKeys() {
 	        int count = 0;

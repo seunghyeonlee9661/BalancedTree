@@ -2,12 +2,14 @@ import java.util.HashSet;
 import java.util.Random;
 
 public class Main {
+	
 	public static void main(String[] args) {
         // 각 트리의 객체를 생성합니다.
-        int degree = 3;  // 예시로 degree를 3으로 설정
+        int degree = 10;  // 예시로 degree를 3으로 설정
         int n = 10000;  // 테스트할 데이터의 크기
-        int rangeStart = 300;  // 범위 검색 시작 값
-        int rangeEnd = 500;    // 범위 검색 종료 값
+        int rangeStart = 1000;  // 범위 검색 시작 값
+        int rangeEnd = 3000;    // 범위 검색 종료 값
+        
 
         // 랜덤 값 생성을 위한 세트와 랜덤 객체
         HashSet<Integer> set = new HashSet<>();  // 중복을 방지할 set
@@ -21,7 +23,6 @@ public class Main {
 
         // 작업 구분과 메모리 사용 체크 함수
         printMemoryUsage("Before Array Insertion");
-
         // 배열 삽입 시간
         long startTime = System.nanoTime();
         int[] array = new int[n];
@@ -44,7 +45,6 @@ public class Main {
         searchArrayRange(array, rangeStart, rangeEnd); // 배열에서 범위 검색
         endTime = System.nanoTime();
         System.out.println("Array Range Search Time: " + convertToMilliseconds(endTime - startTime) + " ms");
-        System.out.println("\n----------------------------------------------------");
 
         // 작업 구분과 메모리 사용 체크 함수
         printMemoryUsage("Before B-Tree Insertion");
@@ -70,34 +70,6 @@ public class Main {
         bMTree.search(rangeStart, rangeEnd);  // 범위 검색
         endTime = System.nanoTime();
         System.out.println("B-Tree Range Search Time: " + convertToMilliseconds(endTime - startTime) + " ms");
-        System.out.println("\n----------------------------------------------------");
-
-        // 작업 구분과 메모리 사용 체크 함수
-        printMemoryUsage("Before B+ Tree Insertion");
-
-        // B+ Tree 삽입 시간
-        startTime = System.nanoTime();
-        BPTree bptree = new BPTree(degree);  // B+ Tree 객체 생성
-        for (int value : set) {
-            bptree.add(value);  // 중복된 값이 아니면 추가
-        }
-        endTime = System.nanoTime();
-        System.out.println("B+ Tree Insertion Time: " + convertToMilliseconds(endTime - startTime) + " ms");
-        printMemoryUsage("After B+ Tree Insertion");
-
-        // B+ Tree 검색 시간
-        startTime = System.nanoTime();
-        for (int i = 0; i < n; i++) bptree.search(i);        
-        endTime = System.nanoTime();
-        System.out.println("B+ Tree Search Time: " + convertToMilliseconds(endTime - startTime) + " ms");
-
-        // B+ Tree 범위 검색 시간
-        startTime = System.nanoTime();
-        bptree.search(rangeStart, rangeEnd);  // 범위 검색
-        endTime = System.nanoTime();
-        System.out.println("B+ Tree Range Search Time: " + convertToMilliseconds(endTime - startTime) + " ms");
-        // 작업 구분
-        System.out.println("\n----------------------------------------------------");
     }
 
     // 배열에서 값 검색
@@ -121,10 +93,15 @@ public class Main {
         return nanoseconds / 1000000.0;
     }
 
-    // 메모리 사용량 출력 함수
+ // 메모리 사용량 출력 함수 (KB 단위로 사용한 메모리만 출력)
     private static void printMemoryUsage(String message) {
         Runtime runtime = Runtime.getRuntime();
-        long memoryUsed = runtime.totalMemory() - runtime.freeMemory();
-        System.out.println("\n" + message + " | Memory used: " + memoryUsed / 1024 / 1024 + " MB");
+        // 가비지 컬렉션을 강제로 실행하여 불필요한 메모리를 정리
+        System.gc();        
+        // 현재 메모리 사용량 계산
+        long memoryUsed = runtime.totalMemory() - runtime.freeMemory();        
+        // 이전 메모리 사용량과 비교하여 차이 계산
+        long memoryDifference = memoryUsed / 1024; // KB 단위로 변환        
+        System.out.println("\n" + message + " | Memory used: " + memoryDifference + " KB");
     }
 }
