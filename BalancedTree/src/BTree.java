@@ -343,12 +343,10 @@ public class BTree {
 		}
 	}
 
-	public void task(int a, int b) {
+	public Stack<Integer> search(int a, int b) {
 		Stack<Integer> st = new Stack<>();
 		findKeys(a, b, root, st);
-		while (st.isEmpty() == false) {
-			this.remove(root, st.pop());
-		}
+		return st;  // Stack에 저장된 모든 값을 출력
 	}
 
 	private void findKeys(int a, int b, Node x, Stack<Integer> st) {
