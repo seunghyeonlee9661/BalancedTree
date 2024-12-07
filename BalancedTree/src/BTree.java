@@ -66,6 +66,28 @@ public class BTree {
 		}
 	}
 
+	// 범위 검색 - 공개
+	public Stack<Integer> search(int a, int b) {
+		Stack<Integer> st = new Stack<>();
+		findKeys(a, b, root, st);
+		return st;  // Stack에 저장된 모든 값을 출력
+	}
+	
+	// 범위 검색 - 내부 구현
+	private void findKeys(int a, int b, Node x, Stack<Integer> st) {
+		int i = 0;
+		for (i = 0; i < x.count && x.key[i] < b; i++) {
+			if (x.key[i] > a) {
+				st.push(x.key[i]);
+			}
+		}
+		if (!x.leaf) {
+			for (int j = 0; j < i + 1; j++) {
+				findKeys(a, b, x.child[j], st);
+			}
+		}
+	}
+
 	// 분할 - left를 분할하여 parent의 왼쪽과 오른쪽 자식으로 추가
 	private void split(Node parent, int pos, Node left) {
 		Node right = new Node();
@@ -343,24 +365,13 @@ public class BTree {
 		}
 	}
 
-	public Stack<Integer> search(int a, int b) {
-		Stack<Integer> st = new Stack<>();
-		findKeys(a, b, root, st);
-		return st;  // Stack에 저장된 모든 값을 출력
-	}
-
-	private void findKeys(int a, int b, Node x, Stack<Integer> st) {
-		int i = 0;
-		for (i = 0; i < x.count && x.key[i] < b; i++) {
-			if (x.key[i] > a) {
-				st.push(x.key[i]);
-			}
+	// 수정 기능 - 공개
+	public void update(int oldKey, int newKey) {
+		if (searchNode(root, oldKey) == null || searchNode(root, newKey) != null) { // 제거할 키가 없거나 추가하고자 하는 키가 이미 있는 경우
+			return;
 		}
-		if (!x.leaf) {
-			for (int j = 0; j < i + 1; j++) {
-				findKeys(a, b, x.child[j], st);
-			}
-		}
+		remove(root, oldKey);		
+		insert(newKey);
 	}
 
 	public void show() {
